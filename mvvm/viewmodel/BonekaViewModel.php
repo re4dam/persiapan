@@ -4,19 +4,18 @@ require_once 'model/TabelBoneka.class.php';
 
 class BonekaViewModel
 {
-    // private $boneka;
     private $tabelBoneka;
-    private $data = [];
+    private $data = []; // For the list of all boneka
+    public $bonekaToEdit = null; // For the single boneka being edited
 
     public function __construct()
     {
-        // $this->boneka = new Boneka();
         $this->tabelBoneka = new TabelBoneka("localhost", "root", "", "db_boneka");
     }
 
     public function getBonekaList()
     {
-        // encapsulation use
+        $this->data = []; // Clear previous list data
         $this->tabelBoneka->open();
         $this->tabelBoneka->getAll();
 
@@ -25,35 +24,25 @@ class BonekaViewModel
             $boneka->setId($row['id']);
             $boneka->setNama($row['nama']);
             $boneka->setHarga($row['harga']);
-
             $this->data[] = $boneka;
         }
-        // Tutup koneksi
         $this->tabelBoneka->close();
-
-        // simplified use
-        // return $this->tabelBoneka->getAll();
     }
 
     public function getBonekaById($id)
     {
-        // encapsulation use
+        $this->bonekaToEdit = null; // Reset
         $this->tabelBoneka->open();
-        $this->tabelBoneka->getById($id);
+        $this->tabelBoneka->getById($id); // Execute query for a single ID
 
-        while ($row = $this->tabelBoneka->getResult()) {
+        if ($row = $this->tabelBoneka->getResult()) { // Fetch the single row
             $boneka = new Boneka();
             $boneka->setId($row['id']);
             $boneka->setNama($row['nama']);
             $boneka->setHarga($row['harga']);
-
-            $this->data[] = $boneka;
+            $this->bonekaToEdit = $boneka; // Assign to the dedicated property
         }
-        // Tutup koneksi
         $this->tabelBoneka->close();
-
-        // simplified use
-        // return $this->tabelBoneka->getById($id);
     }
 
     public function addBoneka($nama, $harga)
@@ -73,23 +62,25 @@ class BonekaViewModel
     public function deleteBoneka($id)
     {
         $this->tabelBoneka->open();
-        return $this->tabelBoneka->delete($id);
+        $result = $this->tabelBoneka->delete($id); // Ensure to capture result if needed
         $this->tabelBoneka->close();
+        return $result; // Return result of delete operation
     }
 
+    // Methods for accessing the list data ($this->data)
     public function getId($i)
     {
-        return $this->data[$i]->id;
+        return $this->data[$i]->getId(); // Assuming Boneka object has getId()
     }
 
     public function getNama($i)
     {
-        return $this->data[$i]->nama;
+        return $this->data[$i]->getNama(); // Assuming Boneka object has getNama()
     }
 
     public function getHarga($i)
     {
-        return $this->data[$i]->harga;
+        return $this->data[$i]->getHarga(); // Assuming Boneka object has getHarga()
     }
 
     public function getSize()
